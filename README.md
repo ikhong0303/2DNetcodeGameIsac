@@ -4,7 +4,15 @@
 아래는 **2DIsac 씬 기준**으로, 스크립트를 실제로 동작시키기 위한 **최소 필수 연결**입니다.  
 스크립트는 “로직”만 담고 있으므로 **씬/프리팹 연결이 없으면 게임이 동작하지 않습니다.**
 
-### 1) NetworkManager 오브젝트
+### 1) SessionConnector 오브젝트
+1. 빈 오브젝트 생성 → 이름: `SessionConnector`
+2. 컴포넌트 추가:
+   - `SessionConnector`
+3. `DontDestroyOnLoad`로 씬 이동 시 유지됩니다.
+
+> 이 단계가 없으면 Host/Join 버튼이 동작하지 않습니다.
+
+### 2) NetworkManager 오브젝트
 1. 빈 오브젝트 생성 → 이름: `NetworkManager`
 2. 컴포넌트 추가:
    - `NetworkManager`
@@ -13,7 +21,7 @@
 
 > 이 단계가 없으면 Host/Client가 시작되지 않습니다.
 
-### 2) 플레이어/투사체/적 프리팹
+### 3) 플레이어/투사체/적 프리팹
 **Player Prefab**
 - 컴포넌트:
   - `NetworkObject`, `NetworkTransform`, `NetworkRigidbody2D`
@@ -39,7 +47,7 @@
   - `NetworkEnemyChaser`
   - `NetworkHealth`
 
-### 3) UI (Host/Join 버튼)
+### 4) UI (Host/Join 버튼)
 1. `Canvas` 생성
 2. UI 구성:
    - `InputField (TMP)` : `RoomCode`
@@ -48,11 +56,16 @@
    - `Text (TMP)` : `Status`
 3. `Canvas`에 `SessionManagerUI` 스크립트 추가 후 **각 UI 참조 연결**
 
-### 4) ServerSpawnManager (적 자동 스폰)
+### 5) ServerSpawnManager (적 자동 스폰)
 1. 빈 오브젝트 생성 → 이름: `ServerSpawnManager`
 2. 스크립트: `ServerSpawnManager`
 3. **Enemy Prefab 연결**
 4. `Spawn Point`(Transform) 1~2개 생성 후 배열에 등록
+
+### 6) Unity Services 설정 확인
+1. `Project Settings → Services → Project ID` 연결 확인
+2. `Authentication` 활성화 확인
+3. `Multiplayer` 활성화 확인
 
 ---
 

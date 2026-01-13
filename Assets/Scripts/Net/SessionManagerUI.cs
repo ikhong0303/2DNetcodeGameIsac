@@ -34,10 +34,21 @@ namespace IsaacLike.Net
             SetStatus("Ready.");
         }
 
+        private void Start()
+        {
+            ValidateBindings();
+        }
+
         private async void OnClickHost()
         {
             try
             {
+                if (SessionConnector.Instance == null)
+                {
+                    SetStatus("SessionConnector is missing in the scene.");
+                    return;
+                }
+
                 string code = GetRoomCodeOrDefault();
                 SetStatus($"Starting Host... (RoomCode: {code})");
 
@@ -55,6 +66,12 @@ namespace IsaacLike.Net
         {
             try
             {
+                if (SessionConnector.Instance == null)
+                {
+                    SetStatus("SessionConnector is missing in the scene.");
+                    return;
+                }
+
                 string code = GetRoomCodeOrDefault();
                 SetStatus($"Joining... (RoomCode: {code})");
 
@@ -100,6 +117,53 @@ namespace IsaacLike.Net
             }
 
             Debug.Log(msg);
+        }
+
+        private void ValidateBindings()
+        {
+            bool hasMissingBinding = false;
+
+            if (roomCodeInput == null)
+            {
+                hasMissingBinding = true;
+                Debug.LogWarning("[SessionManagerUI] RoomCode input is not assigned.");
+            }
+
+            if (hostButton == null)
+            {
+                hasMissingBinding = true;
+                Debug.LogWarning("[SessionManagerUI] Host button is not assigned.");
+            }
+
+            if (joinButton == null)
+            {
+                hasMissingBinding = true;
+                Debug.LogWarning("[SessionManagerUI] Join button is not assigned.");
+            }
+
+            if (shutdownButton == null)
+            {
+                hasMissingBinding = true;
+                Debug.LogWarning("[SessionManagerUI] Shutdown button is not assigned.");
+            }
+
+            if (statusText == null)
+            {
+                hasMissingBinding = true;
+                Debug.LogWarning("[SessionManagerUI] Status text is not assigned.");
+            }
+
+            bool hasSessionConnector = FindObjectOfType<SessionConnector>(true) != null;
+            if (!hasSessionConnector)
+            {
+                hasMissingBinding = true;
+                Debug.LogWarning("[SessionManagerUI] SessionConnector is missing in the scene.");
+            }
+
+            if (hasMissingBinding)
+            {
+                SetStatus("Missing UI bindings or SessionConnector. Check Inspector.");
+            }
         }
     }
 }
