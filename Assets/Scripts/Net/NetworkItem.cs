@@ -51,7 +51,22 @@ namespace IsaacLike.Net
             if (playerController == null) return;
 
             ApplyEffect(playerController.gameObject);
+            ShowPickupEffectsClientRpc(transform.position);
             NetworkObject.Despawn();
+        }
+
+        [ClientRpc]
+        private void ShowPickupEffectsClientRpc(Vector3 position)
+        {
+            if (VisualEffectsManager.Instance != null)
+            {
+                VisualEffectsManager.Instance.PlayItemPickup(position);
+            }
+
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySFX("item_pickup");
+            }
         }
 
         private void ApplyEffect(GameObject player)

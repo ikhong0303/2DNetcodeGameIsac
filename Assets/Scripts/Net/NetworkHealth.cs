@@ -114,6 +114,8 @@ namespace IsaacLike.Net
             int next = Mathf.Clamp(CurrentHp.Value - damage, 0, maxHp);
             CurrentHp.Value = next;
 
+            ShowDamageEffectsClientRpc(damage, transform.position);
+
             if (CurrentHp.Value <= 0)
             {
                 if (canRespawn)
@@ -189,6 +191,40 @@ namespace IsaacLike.Net
 
             int next = Mathf.Clamp(CurrentHp.Value + amount, 0, maxHp);
             CurrentHp.Value = next;
+        }
+
+        [ClientRpc]
+        private void ShowDamageEffectsClientRpc(int damage, Vector3 position)
+        {
+            bool isPlayer = GetComponent<NetworkPlayerController2D>() != null;
+
+            if (DamageNumberManager.Instance != null)
+            {
+                DamageNumberManager.Instance.ShowDamage(position, damage, isPlayer);
+            }
+
+            if (VisualEffectsManager.Instance != null)
+            {
+                if (isPlayer)
+                {
+                    VisualEffectsManager.Instance.PlayPlayerHit(position);
+                }
+                else
+                {
+                    VisualEffectsManager.Instance.PlayProjectileHit(position);
+                }
+            }
+
+            if (CameraShake.Instance != null && isPlayer)
+            {
+                CameraShake.Instance.ShakeSmall();
+            }
+
+            if (AudioManager.Instance != null)
+            {
+                string sfxName = isPlayer ? "player_hit" : "enemy_hit";
+                AudioManager.Instance.PlaySFX(sfxName);
+            }
         }
     }
 }
