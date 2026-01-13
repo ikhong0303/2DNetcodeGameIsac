@@ -15,6 +15,18 @@ namespace IsaacLike.Net
 
         private int _currentWave = 0;
 
+        public static ServerSpawnManager Instance { get; private set; }
+
+        private void Awake()
+        {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+        }
+
         public override void OnNetworkSpawn()
         {
             if (!IsServer)
@@ -32,7 +44,7 @@ namespace IsaacLike.Net
             }
         }
 
-        private void SpawnEnemies(int count)
+        public void SpawnEnemies(int count)
         {
             if (enemyPrefab == null)
             {

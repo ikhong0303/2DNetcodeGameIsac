@@ -87,7 +87,7 @@ namespace IsaacLike.Net
                 {
                     actualMoveSpeed *= _powerups.SpeedMultiplier.Value;
                 }
-                _rb.velocity = _serverMoveInput * actualMoveSpeed;
+                _rb.linearVelocity = _serverMoveInput * actualMoveSpeed;
             }
         }
 

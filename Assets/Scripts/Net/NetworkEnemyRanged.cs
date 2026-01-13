@@ -39,7 +39,7 @@ namespace IsaacLike.Net
             Transform target = FindNearestPlayer();
             if (target == null)
             {
-                _rb.velocity = Vector2.zero;
+                _rb.linearVelocity = Vector2.zero;
                 return;
             }
 
@@ -49,16 +49,16 @@ namespace IsaacLike.Net
             if (distanceToPlayer < tooCloseDistance)
             {
                 dirToPlayer = -dirToPlayer.normalized;
-                _rb.velocity = dirToPlayer * moveSpeed;
+                _rb.linearVelocity = dirToPlayer * moveSpeed;
             }
             else if (distanceToPlayer > keepDistance)
             {
                 dirToPlayer.Normalize();
-                _rb.velocity = dirToPlayer * moveSpeed;
+                _rb.linearVelocity = dirToPlayer * moveSpeed;
             }
             else
             {
-                _rb.velocity = Vector2.zero;
+                _rb.linearVelocity = Vector2.zero;
             }
 
             if (distanceToPlayer <= shootRange && Time.time >= _nextFireTime)

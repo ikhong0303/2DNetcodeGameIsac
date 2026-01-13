@@ -148,7 +148,7 @@ namespace IsaacLike.Net
             var rb = GetComponent<Rigidbody2D>();
             if (rb != null)
             {
-                rb.velocity = Vector2.zero;
+                rb.linearVelocity = Vector2.zero;
             }
 
             var colliders = GetComponentsInChildren<Collider2D>();

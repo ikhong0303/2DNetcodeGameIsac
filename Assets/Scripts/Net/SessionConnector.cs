@@ -150,7 +150,7 @@ namespace IsaacLike.Net
             try
             {
                 await EnsureReadyAsync();
-                _activeSession = await MultiplayerService.Instance.JoinSessionAsync(sessionIdOrJoinCode);
+                _activeSession = await MultiplayerService.Instance.JoinSessionByIdAsync(sessionIdOrJoinCode);
                 NetworkManager.Singleton.StartClient();
             }
             finally

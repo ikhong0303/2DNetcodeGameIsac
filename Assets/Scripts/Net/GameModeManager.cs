@@ -153,6 +153,7 @@ namespace IsaacLike.Net
             if (ServerSpawnManager.Instance != null)
             {
                 Debug.Log($"Spawning survival wave {SurvivalWave.Value} with {enemyCount} enemies");
+                ServerSpawnManager.Instance.SpawnEnemies(enemyCount);
             }
         }
 

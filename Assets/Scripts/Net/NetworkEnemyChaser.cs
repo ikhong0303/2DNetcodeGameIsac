@@ -31,7 +31,7 @@ namespace IsaacLike.Net
             Transform target = FindNearestPlayer();
             if (target == null)
             {
-                _rb.velocity = Vector2.zero;
+                _rb.linearVelocity = Vector2.zero;
                 return;
             }
 
@@ -41,7 +41,7 @@ namespace IsaacLike.Net
                 dir.Normalize();
             }
 
-            _rb.velocity = dir * moveSpeed;
+            _rb.linearVelocity = dir * moveSpeed;
         }
 
         private Transform FindNearestPlayer()

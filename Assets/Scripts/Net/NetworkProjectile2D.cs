@@ -71,7 +71,7 @@ namespace IsaacLike.Net
                 return;
             }
 
-            _rb.velocity = _dir.Value * _speed.Value;
+            _rb.linearVelocity = _dir.Value * _speed.Value;
 
             if (Time.time >= _dieAt)
             {

@@ -59,7 +59,7 @@ namespace IsaacLike.Net
             Transform target = FindNearestPlayer();
             if (target == null)
             {
-                _rb.velocity = Vector2.zero;
+                _rb.linearVelocity = Vector2.zero;
                 return;
             }
 
@@ -117,7 +117,7 @@ namespace IsaacLike.Net
                 dir.Normalize();
             }
 
-            _rb.velocity = dir * moveSpeed;
+            _rb.linearVelocity = dir * moveSpeed;
         }
 
         private void StartCharge(Transform target)
@@ -131,7 +131,7 @@ namespace IsaacLike.Net
 
         private void PerformCharge()
         {
-            _rb.velocity = _chargeDirection * chargeSpeed;
+            _rb.linearVelocity = _chargeDirection * chargeSpeed;
         }
 
         private void ShootAtPlayer(Transform target)
@@ -142,7 +142,7 @@ namespace IsaacLike.Net
                 return;
             }
 
-            _rb.velocity = Vector2.zero;
+            _rb.linearVelocity = Vector2.zero;
 
             StartCoroutine(ShootBurstCoroutine(target));
             _nextFireTime = Time.time + fireInterval + (burstCount * burstInterval);
