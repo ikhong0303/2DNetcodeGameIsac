@@ -9,10 +9,16 @@ namespace IsaacLike.Net
         [Header("Health")]
         [SerializeField] private int maxHp = 6;
 
+        [Header("Respawn (Players only)")]
+        [SerializeField] private bool canRespawn = false;
+        [SerializeField] private float respawnDelay = 2f;
+        [SerializeField] private Vector2 respawnPosition = Vector2.zero;
+
         [Header("UI (optional)")]
         [SerializeField] private TMP_Text hpText;
 
         public NetworkVariable<int> CurrentHp { get; private set; }
+        private bool _isRespawning;
 
         private void Awake()
         {
@@ -65,13 +71,65 @@ namespace IsaacLike.Net
                 return;
             }
 
+            if (_isRespawning)
+            {
+                return;
+            }
+
             int next = Mathf.Clamp(CurrentHp.Value - damage, 0, maxHp);
             CurrentHp.Value = next;
 
             if (CurrentHp.Value <= 0)
             {
-                NetworkObject.Despawn();
+                if (canRespawn)
+                {
+                    StartCoroutine(RespawnCoroutine());
+                }
+                else
+                {
+                    NetworkObject.Despawn();
+                }
             }
+        }
+
+        private System.Collections.IEnumerator RespawnCoroutine()
+        {
+            _isRespawning = true;
+
+            var playerController = GetComponent<NetworkPlayerController2D>();
+            if (playerController != null)
+            {
+                playerController.enabled = false;
+            }
+
+            var rb = GetComponent<Rigidbody2D>();
+            if (rb != null)
+            {
+                rb.velocity = Vector2.zero;
+            }
+
+            var colliders = GetComponentsInChildren<Collider2D>();
+            foreach (var col in colliders)
+            {
+                col.enabled = false;
+            }
+
+            yield return new UnityEngine.WaitForSeconds(respawnDelay);
+
+            transform.position = respawnPosition;
+            CurrentHp.Value = maxHp;
+
+            foreach (var col in colliders)
+            {
+                col.enabled = true;
+            }
+
+            if (playerController != null)
+            {
+                playerController.enabled = true;
+            }
+
+            _isRespawning = false;
         }
 
         public void Heal(int amount)

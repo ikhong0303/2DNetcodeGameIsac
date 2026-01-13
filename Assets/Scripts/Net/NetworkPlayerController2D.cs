@@ -39,6 +39,12 @@ namespace IsaacLike.Net
             Vector2 shootDir = ReadShootDirection();
             if (shootDir.sqrMagnitude > 0.01f && Time.time >= _nextFireTime)
             {
+                if (projectilePrefab == null)
+                {
+                    Debug.LogWarning("Projectile prefab is not assigned!");
+                    return;
+                }
+
                 _nextFireTime = Time.time + fireInterval;
                 RequestShootServerRpc(shootDir.normalized);
             }
@@ -48,10 +54,7 @@ namespace IsaacLike.Net
         {
             if (IsOwner)
             {
-                Vector2 move = new Vector2(
-                    Input.GetAxisRaw("Horizontal"),
-                    Input.GetAxisRaw("Vertical")
-                );
+                Vector2 move = ReadMoveInput();
 
                 if (move.sqrMagnitude > 1f)
                 {
@@ -69,6 +72,34 @@ namespace IsaacLike.Net
             {
                 _rb.velocity = _serverMoveInput * moveSpeed;
             }
+        }
+
+        private Vector2 ReadMoveInput()
+        {
+            float x = 0f;
+            float y = 0f;
+
+            if (Input.GetKey(KeyCode.A))
+            {
+                x -= 1f;
+            }
+
+            if (Input.GetKey(KeyCode.D))
+            {
+                x += 1f;
+            }
+
+            if (Input.GetKey(KeyCode.S))
+            {
+                y -= 1f;
+            }
+
+            if (Input.GetKey(KeyCode.W))
+            {
+                y += 1f;
+            }
+
+            return new Vector2(x, y);
         }
 
         [ServerRpc]
