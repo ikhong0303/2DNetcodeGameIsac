@@ -109,6 +109,14 @@ namespace IsaacLike.Net
             {
                 await EnsureReadyAsync();
 
+                // Check if NetworkManager exists
+                if (NetworkManager.Singleton == null)
+                {
+                    throw new InvalidOperationException(
+                        "NetworkManager.Singleton is null. " +
+                        "Make sure there is a NetworkManager in the scene and it is active.");
+                }
+
                 var options = new SessionOptions
                 {
                     MaxPlayers = 2,
@@ -150,6 +158,15 @@ namespace IsaacLike.Net
             try
             {
                 await EnsureReadyAsync();
+
+                // Check if NetworkManager exists
+                if (NetworkManager.Singleton == null)
+                {
+                    throw new InvalidOperationException(
+                        "NetworkManager.Singleton is null. " +
+                        "Make sure there is a NetworkManager in the scene and it is active.");
+                }
+
                 _activeSession = await MultiplayerService.Instance.JoinSessionByIdAsync(sessionIdOrJoinCode);
                 NetworkManager.Singleton.StartClient();
             }
