@@ -73,6 +73,15 @@ namespace IsaacLike.Net
                     move.Normalize();
                 }
 
+                // Client-side prediction: Apply movement locally for immediate response
+                float actualMoveSpeed = moveSpeed;
+                if (_powerups != null)
+                {
+                    actualMoveSpeed *= _powerups.SpeedMultiplier.Value;
+                }
+                _rb.linearVelocity = move * actualMoveSpeed;
+
+                // Send input to server for authoritative validation
                 if ((move - _lastSentMove).sqrMagnitude > 0.0001f)
                 {
                     _lastSentMove = move;
@@ -80,7 +89,8 @@ namespace IsaacLike.Net
                 }
             }
 
-            if (IsServer)
+            // Server still validates and applies movement (will sync back via NetworkTransform)
+            if (IsServer && !IsOwner)
             {
                 float actualMoveSpeed = moveSpeed;
                 if (_powerups != null)
