@@ -162,10 +162,22 @@ namespace IsaacLike.Net
                         "Make sure there is a NetworkManager in the scene and it is active.");
                 }
 
-                _activeSession = await MultiplayerService.Instance.JoinSessionByIdAsync(sessionIdOrJoinCode);
+                // Use CreateOrJoinSessionAsync with relay network options.
+                // This will join the existing session if it exists with the same sessionId,
+                // or create a new one if it doesn't exist.
+                // JoinSessionByIdAsync doesn't work because the lobby ID is auto-generated,
+                // not the sessionId we provide.
+                var options = new SessionOptions
+                {
+                    MaxPlayers = 2,
+                    IsPrivate = false,
+                    Name = $"Isaac2D_{sessionIdOrJoinCode}"
+                }.WithRelayNetwork();
+
+                _activeSession = await MultiplayerService.Instance.CreateOrJoinSessionAsync(sessionIdOrJoinCode, options);
 
                 // Note: The SDK automatically starts the client connection when joining a relay session.
-                Debug.Log($"Joined session. IsHost: {_activeSession.IsHost}, Id: {_activeSession.Id}");
+                Debug.Log($"Joined session. IsHost: {_activeSession.IsHost}, Id: {_activeSession.Id}, Code: {_activeSession.Code}");
             }
             finally
             {
