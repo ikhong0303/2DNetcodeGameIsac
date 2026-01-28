@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 3000000005}
   - component: {fileID: 3000000006}
   - component: {fileID: 1061686144415791815}
+  - component: {fileID: 223775806633686977}
   m_Layer: 0
   m_Name: EnemyNet
   m_TagString: Untagged
@@ -240,3 +241,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   config: {fileID: 11400000, guid: 9ca64feba4dc674499344b953bc0f959, type: 2}
+--- !u!114 &223775806633686977
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3000000000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2796cd66424be64e8bcbef104506bba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  maxHealth: 5
+  reviveDuration: 3
+  reviveHealth: 3
+  reviveRange: 2
+  downedEvent: {fileID: 11400000, guid: ce4d020fda25e36498c125bc05cd3b27, type: 2}
+  revivedEvent: {fileID: 11400000, guid: ce4d020fda25e36498c125bc05cd3b27, type: 2}

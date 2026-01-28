@@ -145,8 +145,19 @@ namespace TopDownShooter.Networking
 
             Transform spawnPoint = enemySpawnPoints[Random.Range(0, enemySpawnPoints.Length)];
             var enemyInstance = Instantiate(enemyPrefab, spawnPoint.position, Quaternion.identity);
+            
+            // IMPORTANT: Initialize HP BEFORE spawning to ensure proper state
+            if (enemyInstance.TryGetComponent<NetworkHealth>(out var health))
+            {
+                // Set initial health value before network spawn
+                health.CurrentHealth.Value = gameConfig.EnemyConfig.MaxHealth;
+                health.IsDowned.Value = false;
+            }
+            
             enemyInstance.NetworkObject.Spawn(true);
             aliveEnemies.Add(enemyInstance);
+            
+            Debug.Log($"[NetworkGameManager] Spawned enemy at {spawnPoint.position}, HP initialized to {gameConfig.EnemyConfig.MaxHealth}");
         }
 
         private IEnumerator WaitForWaveClear()

@@ -24,6 +24,7 @@ namespace TopDownShooter.Networking
         {
             if (IsServer)
             {
+                Debug.Log($"[NetworkHealth] OnNetworkSpawn: {gameObject.name} - Setting HP to {maxHealth}, IsDowned to false (was: {IsDowned.Value})");
                 CurrentHealth.Value = maxHealth;
                 IsDowned.Value = false;
             }

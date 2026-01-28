@@ -25,10 +25,24 @@ namespace TopDownShooter.Networking
 
         public override void OnNetworkSpawn()
         {
-            if (IsServer && config != null && health != null)
+            // Ensure health reference is valid
+            if (health == null)
             {
-                health.CurrentHealth.Value = config.MaxHealth;
-                health.IsDowned.Value = false;
+                health = GetComponent<NetworkHealth>();
+            }
+
+            if (IsServer)
+            {
+                if (health != null && config != null)
+                {
+                    Debug.Log($"[NetworkEnemy] OnNetworkSpawn: {gameObject.name} - Initializing HP to {config.MaxHealth}, IsDowned was: {health.IsDowned.Value}");
+                    health.CurrentHealth.Value = config.MaxHealth;
+                    health.IsDowned.Value = false;
+                }
+                else
+                {
+                    Debug.LogError($"[NetworkEnemy] OnNetworkSpawn: {gameObject.name} - health or config is null! health={health}, config={config}");
+                }
             }
         }
 
@@ -94,68 +108,109 @@ namespace TopDownShooter.Networking
 
         public void ReceiveDamage(int amount, ulong attackerId)
     {
-        if (!IsServer || health == null || health.IsDowned.Value)
+        if (!IsServer)
         {
             return;
         }
 
-        lastAttackerId = attackerId;
-        health.ApplyDamage(amount);
-        
-        Debug.Log($"[NetworkEnemy] Took {amount} damage. Current HP: {health.CurrentHealth.Value}/{config.MaxHealth}");
+        // Fallback: try to get health component if not cached
+        if (health == null)
+        {
+            health = GetComponent<NetworkHealth>();
+            if (health == null)
+            {
+                Debug.LogError($"[NetworkEnemy] {gameObject.name} is missing NetworkHealth component! Cannot take damage.");
+                return;
+            }
+        }
 
-        // Visual feedback
-        TriggerHitFeedbackClientRpc();
-
+        // Check if already dead (use CurrentHealth instead of IsDowned for enemies)
         if (health.CurrentHealth.Value <= 0)
         {
+            Debug.Log($"[NetworkEnemy] {gameObject.name} is already dead (HP={health.CurrentHealth.Value}), ignoring damage.");
+            return;
+        }
+
+        lastAttackerId = attackerId;
+        int previousHealth = health.CurrentHealth.Value;
+        
+        // Apply damage directly to CurrentHealth
+        int newHealth = Mathf.Max(0, previousHealth - amount);
+        health.CurrentHealth.Value = newHealth;
+        
+        Debug.Log($"[NetworkEnemy] {gameObject.name} took {amount} damage. HP: {previousHealth} -> {newHealth}/{config?.MaxHealth ?? 0}");
+
+        // Server spawns hit effect (NetworkObject spawn must be on server)
+        SpawnHitEffect(transform.position);
+
+        // Visual feedback on all clients (flash red)
+        TriggerHitFeedbackClientRpc();
+
+        if (newHealth <= 0)
+        {
+            Debug.Log($"[NetworkEnemy] {gameObject.name} HP reached 0, calling HandleDeath.");
             HandleDeath();
         }
     }
 
-        private void HandleDeath()
+
+    private void HandleDeath()
+    {
+        if (IsServer)
         {
-            if (IsServer)
+            if (NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(lastAttackerId, out var attackerObject) &&
+                attackerObject.TryGetComponent<NetworkPlayerController>(out var player))
             {
-                if (NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(lastAttackerId, out var attackerObject) &&
-                    attackerObject.TryGetComponent<NetworkPlayerController>(out var player))
-                {
-                    player.AddScore(config.ScoreValue);
-                }
-
-                NetworkGameManager.Instance?.RegisterEnemyDeath(this);
-                NetworkObject.Despawn(true);
+                player.AddScore(config.ScoreValue);
             }
-        }
 
-        // Visual hit feedback: flash red and spawn particles
-        [ClientRpc]
-        private void TriggerHitFeedbackClientRpc()
-        {
-            if (spriteRenderer != null)
-            {
-                StartCoroutine(FlashRed());
-            }
-            SpawnHitEffect(transform.position);
-        }
-
-        private System.Collections.IEnumerator FlashRed()
-        {
-            var originalColor = spriteRenderer.color;
-            spriteRenderer.color = Color.red;
-            yield return new UnityEngine.WaitForSeconds(0.1f);
-            spriteRenderer.color = originalColor;
-        }
-
-        private void SpawnHitEffect(Vector3 position)
-        {
-            var config = NetworkGameManager.Instance?.HitEffectConfig;
-            if (config == null || config.EffectPrefab == null) return;
-            var effectObject = NetworkObjectPool.Instance.Spawn(config.EffectPrefab.NetworkObject, position, Quaternion.identity);
-            if (effectObject != null && effectObject.TryGetComponent<TopDownShooter.Networking.NetworkEffect>(out var effect))
-            {
-                effect.Play(config.Lifetime);
-            }
+            NetworkGameManager.Instance?.RegisterEnemyDeath(this);
+            NetworkObject.Despawn(true);
         }
     }
+
+    // Visual hit feedback: flash red on all clients
+    [ClientRpc]
+    private void TriggerHitFeedbackClientRpc()
+    {
+        if (spriteRenderer != null)
+        {
+            StartCoroutine(FlashRed());
+        }
+    }
+
+    private System.Collections.IEnumerator FlashRed()
+    {
+        var originalColor = spriteRenderer.color;
+        spriteRenderer.color = Color.red;
+        yield return new UnityEngine.WaitForSeconds(0.1f);
+        spriteRenderer.color = originalColor;
+    }
+
+    private void SpawnHitEffect(Vector3 position)
+    {
+        // NetworkObject spawn can only happen on the server
+        if (!IsServer) return;
+
+        var hitConfig = NetworkGameManager.Instance?.HitEffectConfig;
+        if (hitConfig == null || hitConfig.EffectPrefab == null)
+        {
+            Debug.LogWarning("[NetworkEnemy] HitEffectConfig or EffectPrefab is null. Skipping hit effect.");
+            return;
+        }
+
+        var prefabNetworkObject = hitConfig.EffectPrefab.GetComponent<NetworkObject>();
+        if (prefabNetworkObject == null)
+        {
+            Debug.LogWarning("[NetworkEnemy] EffectPrefab is missing NetworkObject component.");
+            return;
+        }
+
+        var effectObject = NetworkObjectPool.Instance.Spawn(prefabNetworkObject, position, Quaternion.identity);
+        if (effectObject != null && effectObject.TryGetComponent<TopDownShooter.Networking.NetworkEffect>(out var effect))
+        {
+            effect.Play(hitConfig.Lifetime);
+        }
+    }
+}
 }

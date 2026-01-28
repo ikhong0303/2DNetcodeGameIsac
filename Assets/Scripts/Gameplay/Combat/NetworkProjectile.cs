@@ -59,19 +59,20 @@ namespace TopDownShooter.Networking
 
             if (other.TryGetComponent<NetworkEnemy>(out var enemy))
             {
+                Debug.Log($"[NetworkProjectile] Hit enemy: {other.gameObject.name}");
                 enemy.ReceiveDamage(damage, ownerId);
                 SpawnHitEffect(other.transform.position);
                 if (NetworkObject != null && NetworkObject.IsSpawned) {
-                NetworkObjectPool.Instance.Despawn(NetworkObject);
-            }
+                    NetworkObjectPool.Instance.Despawn(NetworkObject);
+                }
             }
             else if (other.TryGetComponent<NetworkHealth>(out var health) && !other.TryGetComponent<NetworkPlayerController>(out _))
             {
                 health.ApplyDamage(damage);
                 SpawnHitEffect(other.transform.position);
                 if (NetworkObject != null && NetworkObject.IsSpawned) {
-                NetworkObjectPool.Instance.Despawn(NetworkObject);
-            }
+                    NetworkObjectPool.Instance.Despawn(NetworkObject);
+                }
             }
         }
 
