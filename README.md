@@ -1,6 +1,6 @@
 # Project Boxhead Network
 
-**Unity 2D 탑다운 멀티플레이 슈팅 게임**  
+**Unity 2D 탑다운 멀티플레이 슈팅 게임 탬플릿**  
 Netcode for GameObjects(NGO) 기반 | 2인 협동 P2P(Host-Client)
 
 ---
@@ -66,9 +66,9 @@ Netcode for GameObjects(NGO) 기반 | 2인 협동 P2P(Host-Client)
 ## 🚀 시작 가이드
 
 ### 실행 방법
-1. **Lobby Scene**에서 시작
+1. **SampleScene**에서 시작
 2. **Host** 버튼으로 방 생성
-3. 다른 플레이어는 **Client** 버튼으로 접속
+3. **Join Code** 입력 후 **Join** 버튼으로 접속
 
 ### 조작법
 | 입력 | 동작 |
@@ -93,3 +93,56 @@ Netcode for GameObjects(NGO) 기반 | 2인 협동 P2P(Host-Client)
 - `NetworkGameManager`, `NetworkPlayerController` 책임 분리
 - 싱글톤 의존도 감소
 - UI와 게임 로직 경계 분리
+
+---
+
+## 📥 학생용 프로젝트 시작 가이드
+
+### 1단계: 프로젝트 다운로드
+1. 이 GitHub 페이지에서 **Code** 버튼 클릭
+2. **Download ZIP** 선택
+3. 다운로드된 ZIP 파일 압축 해제
+
+### 2단계: Unity Hub에서 열기
+1. **Unity Hub** 실행
+2. **Projects** → **Add** → 압축 해제한 폴더 선택
+3. Unity 버전이 맞지 않으면 설치 안내가 나올 수 있음
+
+### 3단계: Unity 계정 연동 (중요!)
+1. Unity 에디터에서 프로젝트 열기
+2. 메뉴: **Edit** → **Project Settings** → **Services**
+3. **Link your Unity project** 클릭
+4. Unity 계정으로 로그인
+5. 새 프로젝트 ID 생성 또는 기존 프로젝트 선택
+
+> ⚠️ **Unity 계정 연동을 하지 않으면 Relay 서비스가 작동하지 않아 멀티플레이가 불가능합니다!**
+
+### 4단계: 게임 실행
+1. **Assets/Scenes/SampleScene** 열기
+2. **Play** 버튼으로 실행
+3. **Host** 버튼으로 방 생성 → Join Code 표시됨
+4. 두 번째 플레이어: 빌드 파일 실행 또는 다른 PC에서 Join Code 입력 후 접속
+5. 2명 접속 완료 시 게임 자동 시작!
+
+> 💡 **혼자서 테스트하기**: Unity 6에서는 **Multiplayer Play Mode**를 사용하면 빌드 없이 에디터에서 2명을 동시에 테스트할 수 있습니다.
+> - 메뉴: **Window** → **Multiplayer Play Mode**
+> - **Player 2** 활성화 끝난 후 Play 버튼 클릭
+
+---
+
+## ⚠️ Unity Relay 서버 제한량 안내
+
+이 프로젝트는 **Unity Relay** 서비스를 사용하여 멀티플레이를 구현합니다.  
+Unity는 무료 플랜에서 **월별 제한량**을 제공하며, 제한량을 모두 사용하면 테스트가 불가능해집니다.
+
+### 무료 플랜 제한 (2024년 기준)
+- **동시 접속자 (CCU)**: 200명
+- **대역폭**: 50GB/월
+
+### 남은 제한량 확인 방법
+1. [Unity Cloud Dashboard](https://cloud.unity.com/) 접속
+2. 로그인 후 프로젝트 선택
+3. **Multiplayer** → **Relay** 메뉴에서 사용량 확인
+
+> ⚠️ 제한량이 부족하면 접속 시 오류가 발생할 수 있습니다. 미리 확인하세요!
+
